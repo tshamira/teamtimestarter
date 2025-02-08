@@ -14,16 +14,50 @@ team_games = []
 if response.status_code == 200:
     # Parse the JSON response
     data = response.json()
-
     # Print the data
 #     print(data)
     
 home_team_vs_away_teams, game_start_dates, game_start_times, game_end_dates, game_end_times, locations, game_ids  = [],[],[],[],[],[],[]
 
-format = '%H:%M:%S'
-timezone = "PST"
 
+#timezone = "PST"
+
+def timezone_adjustment(timezone):
+    # timezone is a string of three or four character denoting the timezone that the user is using the app in.
+    # something tricky about timezones is that they can change depending on the time of year (due to daylight savings time).. will try to account for this
+    format = '%H:%M:%S'
+    game_start_time_ET = datetime.strptime(game['etm'][-8:], '%H:%M:%S')
+
+    # USA
+    if timezone == "EST":
+        # UTC -05
+        game_start_times.append(game_start_time)
+    elif timezone == "CST":
+        game_start_time = (game_start_time_ET - datetime.strptime("01:00:00", format))
+        game_start_times.append(game_start_time)
+    elif timezone == "MST":
+        game_start_time = (game_start_time_ET - datetime.strptime("02:00:00", format))
+        game_start_times.append(game_start_time)
+    elif timezone == "PST":
+        game_start_time = (game_start_time_ET - datetime.strptime("03:00:00", format))
+        game_start_times.append(game_start_time)
+    elif timezone == "AKST":
+        game_start_time = (game_start_time_ET - datetime.strptime("04:00:00", format))
+        game_start_times.append(game_start_time)
+    elif timezone == "HST":
+        game_start_time = (game_start_time_ET - datetime.strptime("05:00:00", format))
+        game_start_times.append(game_start_time)
+    else:
+        print("Incorrect/missing timezone.")
+        break
+    
+
+
+    
 def team_time(team_name, timezone):
+    #format = '%H:%M:%S'
+    format = '%H:%M:%S'
+    game_start_time_ET = datetime.strptime(game['etm'][-8:], '%H:%M:%S')
     for nba_game in data['lscd']:
         month_games = nba_game['mscd']
             
@@ -40,9 +74,10 @@ def team_time(team_name, timezone):
                 game_start_date = game['gdte']
                 game_start_dates.append(game_start_date)
                 
-                # accounting for different time zones (US only)
-                game_start_time_ET = datetime.strptime(game['etm'][-8:], '%H:%M:%S')
+                # accounting for different time zones
+                # insert time zone adjustment function here
                 if timezone == "EST":
+                    # UTC -05
                     game_start_times.append(game_start_time)
                 elif timezone == "CST":
                     game_start_time = (game_start_time_ET - datetime.strptime("01:00:00", format))
