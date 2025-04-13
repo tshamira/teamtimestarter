@@ -54,9 +54,8 @@ def timezone_adjustment(timezone):
 
 
     
-def team_time(team_name, timezone):
-    #format = '%H:%M:%S'
-    format = '%H:%M:%S'
+def team_time(team_name):
+    format = '%H:%M'
     game_start_time_ET = datetime.strptime(game['etm'][-8:], '%H:%M:%S')
     for nba_game in data['lscd']:
         month_games = nba_game['mscd']
@@ -73,37 +72,18 @@ def team_time(team_name, timezone):
                 # game start dates + times
                 game_start_date = game['gdte']
                 game_start_dates.append(game_start_date)
-                
-                # accounting for different time zones
-                # insert time zone adjustment function here
-                if timezone == "EST":
-                    # UTC -05
-                    game_start_times.append(game_start_time)
-                elif timezone == "CST":
-                    game_start_time = (game_start_time_ET - datetime.strptime("01:00:00", format))
-                    game_start_times.append(game_start_time)
-                elif timezone == "MST":
-                    game_start_time = (game_start_time_ET - datetime.strptime("02:00:00", format))
-                    game_start_times.append(game_start_time)
-                elif timezone == "PST":
-                    game_start_time = (game_start_time_ET - datetime.strptime("03:00:00", format))
-                    game_start_times.append(game_start_time)
-                elif timezone == "AKST":
-                    game_start_time = (game_start_time_ET - datetime.strptime("04:00:00", format))
-                    game_start_times.append(game_start_time)
-                elif timezone == "HST":
-                    game_start_time = (game_start_time_ET - datetime.strptime("05:00:00", format))
-                    game_start_times.append(game_start_time)
-                else:
-                    print("Incorrect/missing timezone.")
-                    break
+
+                game_start_time_str = game['etm'][-8:-3]
+                start_datetime = datetime.strptime(game_start_time_str, "%H:%M")
+                game_start_times.append(game_start_time_dt)
                     
                 # game end dates + times
                 game_end_date = game['gdte']
                 game_end_dates.append(game_end_date)
-                # avg length of nba game is 2 hours 18 minutes -> 
-                # datetime.strptime(game['etm'][-8:], '%H:%M:%S')
-                game_end_time = (game_start_time + timedelta(minutes=138))
+                
+                game_duration = timedelta(minutes=150)
+                end_datetime = start_datetime + game_duration
+                game_end_time = end_datetime.time()
                 game_end_times.append(game_end_time)
                 
                 # game location (city of home team)
