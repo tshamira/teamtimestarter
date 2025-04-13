@@ -20,7 +20,7 @@ if response.status_code == 200:
     
 home_team_vs_away_teams, game_start_dates, game_start_times, game_end_dates, game_end_times, locations, game_ids  = [],[],[],[],[],[],[]
 
-format = '%H:%M:%S'
+format = '%H:%M'
 
 for nba_game in data['lscd']:
     month_games = nba_game['mscd']
@@ -39,16 +39,16 @@ for nba_game in data['lscd']:
             game_start_dates.append(game_start_date)
 
             game_start_time_str = game['etm'][-8:-3]
-            game_start_time_dt = datetime.strptime(game_start_time_str, format).time()
-            #game_start_time = datetime.strptime(game_start_time_str, format).time()
+            start_datetime = datetime.strptime(game_start_time_str, "%H:%M")
             game_start_times.append(game_start_time_dt)
                 
             # game end dates + times
             game_end_date = game['gdte']
             game_end_dates.append(game_end_date)
-            # avg length of nba game is 2 hours 18 minutes -> 
-            # datetime.strptime(game['etm'][-8:], '%H:%M:%S')
-            game_end_time = (game_start_time + timedelta(minutes=138))
+          
+            game_duration = timedelta(minutes=150)
+            end_datetime = start_datetime + game_duration
+            game_end_time = end_datetime.time()
             game_end_times.append(game_end_time)
             
             # game location (city of home team)
