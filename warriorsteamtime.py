@@ -21,7 +21,6 @@ if response.status_code == 200:
 home_team_vs_away_teams, game_start_dates, game_start_times, game_end_dates, game_end_times, locations, game_ids  = [],[],[],[],[],[],[]
 
 format = '%H:%M:%S'
-timezone = "PST"
 
 for nba_game in data['lscd']:
     month_games = nba_game['mscd']
@@ -38,29 +37,11 @@ for nba_game in data['lscd']:
             # game start dates + times
             game_start_date = game['gdte']
             game_start_dates.append(game_start_date)
-            
-            # accounting for different time zones (US only)
-            game_start_time_ET = datetime.strptime(game['etm'][-8:], '%H:%M:%S')
-            if timezone == "EST":
-                game_start_times.append(game_start_time)
-            elif timezone == "CST":
-                game_start_time = (game_start_time_ET - datetime.strptime("01:00:00", format))
-                game_start_times.append(game_start_time)
-            elif timezone == "MST":
-                game_start_time = (game_start_time_ET - datetime.strptime("02:00:00", format))
-                game_start_times.append(game_start_time)
-            elif timezone == "PST":
-                game_start_time = (game_start_time_ET - datetime.strptime("03:00:00", format))
-                game_start_times.append(game_start_time)
-            elif timezone == "AKST":
-                game_start_time = (game_start_time_ET - datetime.strptime("04:00:00", format))
-                game_start_times.append(game_start_time)
-            elif timezone == "HST":
-                game_start_time = (game_start_time_ET - datetime.strptime("05:00:00", format))
-                game_start_times.append(game_start_time)
-            else:
-                print("Incorrect/missing timezone.")
-                break
+
+            game_start_time_str = game['etm'][-8:-3]
+            game_start_time_dt = datetime.strptime(game_start_time_str, format).time()
+            #game_start_time = datetime.strptime(game_start_time_str, format).time()
+            game_start_times.append(game_start_time_dt)
                 
             # game end dates + times
             game_end_date = game['gdte']
