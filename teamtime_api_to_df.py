@@ -37,7 +37,11 @@ def team_time(team_name):
 
                 game_start_time_str = game['etm'][-8:-3]
                 game_start_datetime = datetime.strptime(game_start_time_str, "%H:%M")
-                game_start_times.append(game_start_datetime)
+                game_start_times.append(game_start_datetime.time())
+                #the .time() has to be added to the appended value bEcause the game_start_datetime variable is used
+                #to calculate the game_end_datetime variable in the next chunk of code; this game_end_datetime variable requires
+                #us to add timedelta (stored in game_duration variable), a process which does not work between 
+                #time and timedelta objects. (datetime + timedelta OK apparently)
                 
                 # game end dates + times
                 game_end_date = game['gdte']
